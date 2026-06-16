@@ -1,6 +1,8 @@
+[phases.setup]
+nixPkgs = ["php83Extensions.mysqli", "php83Extensions.pdo_mysql"]
+
 [phases.build]
 cmds = ["composer install --no-dev --optimize-autoloader"]
 
 [phases.deploy]
 cmds = ["php artisan config:clear", "php artisan migrate --force"]
-

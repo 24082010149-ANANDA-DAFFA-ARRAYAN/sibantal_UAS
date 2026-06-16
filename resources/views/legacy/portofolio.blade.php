@@ -75,8 +75,8 @@
         <?php endif; ?>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-4">
-            <?php if(mysqli_num_rows($query_permintaan) > 0): ?>
-                <?php while($row = mysqli_fetch_assoc($query_permintaan)): ?>
+            <?php if(count($query_permintaan) > 0): ?>
+                <?php foreach($query_permintaan as $row): ?>
                     <?php
                         $link_tujuan = ($role === 'guest') ? 'login.php' : 'detail.php?id=' . $row['id'] . '&tipe=permintaan';
                     ?>
@@ -107,7 +107,7 @@
                             </div>
                         </div>
                     </a>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             <?php else: ?>
                 @include('legacy.partials.empty-state', [
                     'title' => ($search != '' || $kategori_permintaan != '') ? 'Tidak ada hasil yang cocok' : 'Belum ada pengajuan bantuan dari desa yang diverifikasi',
@@ -145,8 +145,8 @@
         <?php endif; ?>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-4">
-            <?php if(mysqli_num_rows($query_penawaran) > 0): ?>
-                <?php while($row = mysqli_fetch_assoc($query_penawaran)): ?>
+            <?php if(count($query_penawaran) > 0): ?>
+                <?php foreach($query_penawaran as $row): ?>
                     <?php
                         $link_tujuan = ($role === 'guest') ? 'login.php' : 'detail.php?id=' . $row['id'] . '&tipe=penawaran';
                     ?>
@@ -172,7 +172,7 @@
                             </div>
                         </div>
                     </a>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             <?php else: ?>
                 @include('legacy.partials.empty-state', [
                     'title' => ($search != '' || $kategori_penawaran != '') ? 'Tidak ada hasil yang cocok' : 'Belum ada penawaran bantuan dari donatur yang tersedia saat ini',

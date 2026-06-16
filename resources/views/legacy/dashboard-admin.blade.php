@@ -57,8 +57,8 @@
                     </tr>
                 </thead>
                 <tbody class="text-sm">
-                    <?php if(mysqli_num_rows($query_desa) > 0): ?>
-                        <?php while($row = mysqli_fetch_assoc($query_desa)): ?>
+                    <?php if(count($query_desa) > 0): ?>
+                        <?php foreach($query_desa as $row): ?>
                         <tr class="border-b border-slate-100 hover:bg-slate-50">
                             <td class="p-3 text-slate-500 whitespace-nowrap"><?= date('d M Y', strtotime($row['created_at'])) ?></td>
                             <td class="p-3">
@@ -117,7 +117,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     <?php else: ?>
                         <tr><td colspan="6" class="p-0">
                             @include('legacy.partials.empty-state', ['title' => 'Belum ada data pengajuan desa', 'icon' => 'inbox'])
@@ -156,8 +156,8 @@
                     </tr>
                 </thead>
                 <tbody class="text-sm">
-                    <?php if(mysqli_num_rows($query_donatur) > 0): ?>
-                        <?php while($row = mysqli_fetch_assoc($query_donatur)): ?>
+                    <?php if(count($query_donatur) > 0): ?>
+                        <?php foreach($query_donatur as $row): ?>
                         <tr class="border-b border-slate-100 hover:bg-slate-50">
                             <td class="p-3 text-slate-500 whitespace-nowrap"><?= date('d M Y', strtotime($row['created_at'])) ?></td>
                             <td class="p-3">
@@ -213,7 +213,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     <?php else: ?>
                         <tr><td colspan="6" class="p-0">
                             @include('legacy.partials.empty-state', ['title' => 'Belum ada data penawaran donatur', 'icon' => 'inbox'])

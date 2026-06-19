@@ -44,27 +44,28 @@
         <?php if ($tipe === 'donatur'): ?>
             <form action="" method="POST" enctype="multipart/form-data" class="space-y-6">
 
-                <div class="bg-teal-50/60 p-5 rounded-2xl border border-teal-100">
-                    <h4 class="font-bold text-teal-900 mb-4 border-b border-teal-200 pb-2 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5"></path></svg>
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <h4 class="font-bold text-slate-700 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         Informasi Instansi &amp; PJ
+                        <span class="ml-auto text-xs font-normal text-slate-400 bg-slate-200 px-2 py-0.5 rounded-full">Hanya dapat diubah oleh Donatur</span>
                     </h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="form-label">Nama Instansi</label>
-                            <input type="text" name="nama_instansi" value="<?= htmlspecialchars($data['nama_instansi']) ?>" class="form-input" required>
+                            <input type="text" value="<?= htmlspecialchars($data['nama_instansi']) ?>" readonly class="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed outline-none text-sm">
                         </div>
                         <div>
                             <label class="form-label">Penanggung Jawab (PJ)</label>
-                            <input type="text" name="pj_donatur" value="<?= htmlspecialchars($data['pj_donatur']) ?>" class="form-input" required>
+                            <input type="text" value="<?= htmlspecialchars($data['pj_donatur']) ?>" readonly class="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed outline-none text-sm">
                         </div>
                         <div>
                             <label class="form-label">Jabatan PJ</label>
-                            <input type="text" name="jabatan_donatur" value="<?= htmlspecialchars($data['jabatan_donatur'] ?? '') ?>" class="form-input" required>
+                            <input type="text" value="<?= htmlspecialchars($data['jabatan_donatur'] ?? '') ?>" readonly class="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed outline-none text-sm">
                         </div>
                         <div>
                             <label class="form-label">Kontak (No. HP/WA)</label>
-                            <input type="text" name="kontak_donatur" value="<?= htmlspecialchars($data['kontak_donatur'] ?? '') ?>" class="form-input" required>
+                            <input type="text" value="<?= htmlspecialchars($data['kontak_donatur'] ?? '') ?>" readonly class="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed outline-none text-sm">
                         </div>
                     </div>
                 </div>
@@ -114,27 +115,28 @@
         <?php elseif ($tipe === 'desa'): ?>
             <form action="" method="POST" enctype="multipart/form-data" class="space-y-6">
 
-                <div class="bg-amber-50/60 p-5 rounded-2xl border border-amber-100">
-                    <h4 class="font-bold text-amber-900 mb-4 border-b border-amber-200 pb-2 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <h4 class="font-bold text-slate-700 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         Informasi Desa &amp; PJ
+                        <span class="ml-auto text-xs font-normal text-slate-400 bg-slate-200 px-2 py-0.5 rounded-full">Hanya dapat diubah oleh Perangkat Desa</span>
                     </h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="form-label">Nama Desa / Kelurahan</label>
-                            <input type="text" name="desa" value="<?= htmlspecialchars($data['desa']) ?>" class="form-input" required>
+                            <input type="text" value="<?= htmlspecialchars($data['desa']) ?>" readonly class="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed outline-none text-sm">
                         </div>
                         <div>
                             <label class="form-label">Penanggung Jawab (PJ)</label>
-                            <input type="text" name="nama_pj" value="<?= htmlspecialchars($data['nama_pj']) ?>" class="form-input" required>
+                            <input type="text" value="<?= htmlspecialchars($data['nama_pj']) ?>" readonly class="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed outline-none text-sm">
                         </div>
                         <div>
                             <label class="form-label">Jabatan</label>
-                            <input type="text" name="jabatan" value="<?= htmlspecialchars($data['jabatan'] ?? '') ?>" class="form-input" required>
+                            <input type="text" value="<?= htmlspecialchars($data['jabatan'] ?? '') ?>" readonly class="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed outline-none text-sm">
                         </div>
                         <div>
                             <label class="form-label">Kontak PJ (No. HP/WA)</label>
-                            <input type="text" name="kontak_pj" value="<?= htmlspecialchars($data['kontak_pj'] ?? '') ?>" class="form-input" placeholder="08xxxxxxxxxx">
+                            <input type="text" value="<?= htmlspecialchars($data['kontak_pj'] ?? '') ?>" readonly class="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed outline-none text-sm">
                         </div>
                     </div>
                 </div>

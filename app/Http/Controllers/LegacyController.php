@@ -457,17 +457,15 @@ class LegacyController extends Controller
                 if ($tipe==='donatur') {
                     $f = $data['dokumen_donatur'];
                     if (isset($_FILES['dokumen_donatur']) && $_FILES['dokumen_donatur']['error']===UPLOAD_ERR_OK) $f = $this->uploadFile('dokumen_donatur','edit_');
-                    $this->q($pdo, "UPDATE penawaran_bantuan SET nama_instansi=?,pj_donatur=?,jabatan_donatur=?,kontak_donatur=?,jenis_penawaran=?,detail_bantuan=?,dokumen_donatur=?,updated_at=NOW() WHERE id=?", [
-                        $request->input('nama_instansi'),$request->input('pj_donatur'),$request->input('jabatan_donatur'),
-                        $request->input('kontak_donatur'),$request->input('jenis_penawaran'),$request->input('detail_bantuan'),$f,$id
+                    $this->q($pdo, "UPDATE penawaran_bantuan SET jenis_penawaran=?,detail_bantuan=?,dokumen_donatur=?,updated_at=NOW() WHERE id=?", [
+                        $request->input('jenis_penawaran'),$request->input('detail_bantuan'),$f,$id
                     ]);
                 } elseif ($tipe==='desa') {
                     $jkk = $request->filled('jumlah_kk') ? intval($request->input('jumlah_kk')) : null;
                     $f = $data['dokumen_desa'];
                     if (isset($_FILES['dokumen_desa']) && $_FILES['dokumen_desa']['error']===UPLOAD_ERR_OK) $f = $this->uploadFile('dokumen_desa','edit_desa_');
-                    $this->q($pdo, "UPDATE permintaan_bantuan SET nama_pj=?,jabatan=?,kontak_pj=?,desa=?,target_bantuan=?,jumlah_kk=?,alasan=?,dokumen_desa=?,updated_at=NOW() WHERE id=?", [
-                        $request->input('nama_pj'),$request->input('jabatan'),$request->input('kontak_pj'),
-                        $request->input('desa'),$request->input('target_bantuan'),$jkk,$request->input('alasan'),$f,$id
+                    $this->q($pdo, "UPDATE permintaan_bantuan SET target_bantuan=?,jumlah_kk=?,alasan=?,dokumen_desa=?,updated_at=NOW() WHERE id=?", [
+                        $request->input('target_bantuan'),$jkk,$request->input('alasan'),$f,$id
                     ]);
                 }
                 $pesan = "<div class='mb-6 p-4 bg-green-100 text-green-700 border border-green-200 rounded-lg font-bold'>Data berhasil diperbarui! <a href='dashboard-admin.php' class='underline'>Kembali ke Dashboard</a></div>";

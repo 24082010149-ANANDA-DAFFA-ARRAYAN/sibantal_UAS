@@ -15,7 +15,6 @@
       <div class="w-full md:w-5/12 bg-teal-500 text-white p-10 flex flex-col justify-center relative overflow-hidden">
         <div class="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-teal-400 opacity-50"></div>
         <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-teal-600 opacity-50"></div>
-        
         <div class="relative z-10">
           <h2 class="text-3xl font-bold mb-4">Bergabunglah Bersama SI BanTal</h2>
           <p class="text-teal-100 text-sm leading-relaxed mb-8">
@@ -52,7 +51,7 @@
           
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Alamat Email</label>
-            <input type="email" name="email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition bg-slate-50 focus:bg-white" placeholder="email@@contoh.com">
+            <input type="email" name="email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition bg-slate-50 focus:bg-white" placeholder="email@contoh.com">
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -69,7 +68,6 @@
           <div class="pt-2">
             <label class="block text-sm font-semibold text-slate-700 mb-3">Daftar Sebagai (Role) *</label>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
               <label class="relative cursor-pointer group">
                 <input type="radio" name="role" value="desa" class="peer sr-only" required onchange="toggleExtraFields()">
                 <div class="h-full rounded-xl border-2 border-slate-200 p-4 text-center hover:bg-slate-50 peer-checked:border-amber-500 peer-checked:bg-amber-50 transition duration-200">
@@ -91,16 +89,48 @@
                   <span class="block text-xs text-slate-500 mt-1">Instansi Pemerintah / Swasta</span>
                 </div>
               </label>
-
             </div>
           </div>
 
-          <div id="field_desa" class="hidden opacity-0 transition-opacity duration-500 mt-4">
-            <label class="block text-sm font-semibold text-amber-700 mb-2">Asal Desa</label>
-            <input type="text" name="asal_desa" id="input_desa" class="w-full px-4 py-3 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition bg-amber-50 focus:bg-white" placeholder="Contoh: Desa Gununganyar">
-            <p class="text-xs text-slate-400 mt-1">Sebutkan nama desa yang Anda wakili.</p>
+          <!-- Field khusus Desa -->
+          <div id="field_desa" class="hidden opacity-0 transition-opacity duration-500 mt-4 space-y-4">
+            <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              Data wilayah ini akan terisi otomatis saat Anda mengajukan bantuan — tidak perlu diketik ulang.
+            </p>
+
+            <!-- Provinsi -->
+            <div>
+              <label class="block text-sm font-semibold text-amber-700 mb-2">Provinsi</label>
+              <select id="sel_provinsi" name="provinsi" class="w-full px-4 py-3 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition bg-amber-50 focus:bg-white">
+                <option value="">-- Pilih Provinsi --</option>
+              </select>
+              <!-- hidden field menyimpan nama teks provinsi yang dipilih -->
+            </div>
+
+            <!-- Kota/Kabupaten -->
+            <div>
+              <label class="block text-sm font-semibold text-amber-700 mb-2">Kota / Kabupaten</label>
+              <select id="sel_kota" name="kota" disabled class="w-full px-4 py-3 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition bg-amber-50 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed">
+                <option value="">-- Pilih Provinsi dulu --</option>
+              </select>
+            </div>
+
+            <!-- Kecamatan -->
+            <div>
+              <label class="block text-sm font-semibold text-amber-700 mb-2">Kecamatan</label>
+              <select id="sel_kecamatan" name="kecamatan" disabled class="w-full px-4 py-3 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition bg-amber-50 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed">
+                <option value="">-- Pilih Kota/Kabupaten dulu --</option>
+              </select>
+            </div>
+
+            <!-- Nama Desa -->
+            <div>
+              <label class="block text-sm font-semibold text-amber-700 mb-2">Nama Desa / Kelurahan</label>
+              <input type="text" name="asal_desa" id="input_desa" class="w-full px-4 py-3 border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition bg-amber-50 focus:bg-white" placeholder="Contoh: Desa Gununganyar">
+            </div>
           </div>
 
+          <!-- Field khusus Donatur -->
           <div id="field_organisasi" class="hidden opacity-0 transition-opacity duration-500 mt-4">
             <label class="block text-sm font-semibold text-teal-700 mb-2">Nama Instansi / Organisasi</label>
             <input type="text" name="nama_organisasi" id="input_organisasi" class="w-full px-4 py-3 border border-teal-300 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none transition bg-teal-50 focus:bg-white" placeholder="Contoh: PT. Samudera Indonesia / Pribadi">
@@ -121,39 +151,106 @@
 </main>
 
 <script>
-// Logika JavaScript untuk memunculkan kolom khusus berdasarkan pilihan Role
+const BASE_URL = 'https://raw.githubusercontent.com/ibnux/data-indonesia/master';
+
+// ── Toggle show/hide field desa & donatur ────────────────────────────────────
 function toggleExtraFields() {
-    // Cari radio button yang sedang di-check
-    const selectedRole = document.querySelector('input[name="role"]:checked');
-    if (!selectedRole) return;
-    
-    const role = selectedRole.value;
+    const role = document.querySelector('input[name="role"]:checked')?.value;
     const fieldDesa = document.getElementById('field_desa');
+    const fieldOrg  = document.getElementById('field_organisasi');
     const inputDesa = document.getElementById('input_desa');
-    const fieldOrganisasi = document.getElementById('field_organisasi');
-    const inputOrganisasi = document.getElementById('input_organisasi');
+    const inputOrg  = document.getElementById('input_organisasi');
 
-    // Reset semua tampilan dan status required
-    fieldDesa.classList.add('hidden');
-    fieldDesa.classList.remove('opacity-100');
+    // reset dulu
+    fieldDesa.classList.add('hidden'); fieldDesa.classList.remove('opacity-100');
+    fieldOrg.classList.add('hidden');  fieldOrg.classList.remove('opacity-100');
     inputDesa.required = false;
+    inputOrg.required  = false;
 
-    fieldOrganisasi.classList.add('hidden');
-    fieldOrganisasi.classList.remove('opacity-100');
-    inputOrganisasi.required = false;
-
-    // Munculkan sesuai pilihan
     if (role === 'desa') {
         fieldDesa.classList.remove('hidden');
-        // Tambahkan delay kecil agar efek transisi opacity terlihat
         setTimeout(() => fieldDesa.classList.add('opacity-100'), 50);
         inputDesa.required = true;
+        loadProvinsi(); // muat provinsi saat pertama kali role desa dipilih
     } else if (role === 'donatur') {
-        fieldOrganisasi.classList.remove('hidden');
-        setTimeout(() => fieldOrganisasi.classList.add('opacity-100'), 50);
-        inputOrganisasi.required = true;
+        fieldOrg.classList.remove('hidden');
+        setTimeout(() => fieldOrg.classList.add('opacity-100'), 50);
+        inputOrg.required = true;
     }
 }
+
+// ── Dropdown berantai provinsi → kota → kecamatan ───────────────────────────
+let provinsiLoaded = false;
+
+function setLoading(selectEl, msg) {
+    selectEl.innerHTML = `<option value="">${msg}</option>`;
+    selectEl.disabled = true;
+}
+
+function setOptions(selectEl, items, placeholder) {
+    selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+    items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.nama;          // simpan nama teks (bukan id) ke database
+        opt.dataset.id = item.id;       // simpan id untuk fetch berantai
+        opt.textContent = item.nama;
+        selectEl.appendChild(opt);
+    });
+    selectEl.disabled = false;
+}
+
+async function loadProvinsi() {
+    if (provinsiLoaded) return;
+    const sel = document.getElementById('sel_provinsi');
+    setLoading(sel, 'Memuat provinsi...');
+    try {
+        const res = await fetch(`${BASE_URL}/provinsi.json`);
+        const data = await res.json();
+        setOptions(sel, data, '-- Pilih Provinsi --');
+        provinsiLoaded = true;
+    } catch {
+        sel.innerHTML = '<option value="">Gagal memuat data</option>';
+    }
+}
+
+document.getElementById('sel_provinsi').addEventListener('change', async function () {
+    const selKota = document.getElementById('sel_kota');
+    const selKec  = document.getElementById('sel_kecamatan');
+
+    // reset kota & kecamatan
+    setLoading(selKota, '-- Pilih Kota/Kabupaten dulu --');
+    setLoading(selKec,  '-- Pilih Kota/Kabupaten dulu --');
+
+    const selectedOpt = this.options[this.selectedIndex];
+    const provId = selectedOpt?.dataset?.id;
+    if (!provId) return;
+
+    setLoading(selKota, 'Memuat kota/kabupaten...');
+    try {
+        const res = await fetch(`${BASE_URL}/kabupaten/${provId}.json`);
+        const data = await res.json();
+        setOptions(selKota, data, '-- Pilih Kota/Kabupaten --');
+    } catch {
+        selKota.innerHTML = '<option value="">Gagal memuat data</option>';
+    }
+});
+
+document.getElementById('sel_kota').addEventListener('change', async function () {
+    const selKec = document.getElementById('sel_kecamatan');
+    setLoading(selKec, 'Memuat kecamatan...');
+
+    const selectedOpt = this.options[this.selectedIndex];
+    const kotaId = selectedOpt?.dataset?.id;
+    if (!kotaId) return;
+
+    try {
+        const res = await fetch(`${BASE_URL}/kecamatan/${kotaId}.json`);
+        const data = await res.json();
+        setOptions(selKec, data, '-- Pilih Kecamatan --');
+    } catch {
+        selKec.innerHTML = '<option value="">Gagal memuat data</option>';
+    }
+});
 </script>
 
 @include('layouts.footer')

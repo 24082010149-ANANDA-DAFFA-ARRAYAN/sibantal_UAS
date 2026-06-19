@@ -142,6 +142,9 @@ class LegacyController extends Controller
                 $_SESSION['nama_lengkap'] = $row['nama_lengkap'];
                 $_SESSION['role'] = $row['role'];
                 $_SESSION['asal_desa'] = $row['asal_desa'];
+                $_SESSION['provinsi'] = $row['provinsi'] ?? '';
+                $_SESSION['kota'] = $row['kota'] ?? '';
+                $_SESSION['kecamatan'] = $row['kecamatan'] ?? '';
                 $_SESSION['nama_organisasi'] = $row['nama_organisasi'];
                 return redirect($this->dashboardByRole($row['role']));
             }
@@ -161,6 +164,9 @@ class LegacyController extends Controller
             $password = $request->input('password');
             $role = $request->input('role');
             $asal_desa = $request->filled('asal_desa') ? $request->input('asal_desa') : null;
+            $provinsi = $request->filled('provinsi') ? $request->input('provinsi') : null;
+            $kota = $request->filled('kota') ? $request->input('kota') : null;
+            $kecamatan = $request->filled('kecamatan') ? $request->input('kecamatan') : null;
             $nama_org = $request->filled('nama_organisasi') ? $request->input('nama_organisasi') : null;
             if ($password !== $request->input('konfirmasi')) {
                 $error = 'Konfirmasi password tidak cocok!';
@@ -169,7 +175,7 @@ class LegacyController extends Controller
             } else {
                 $hash = password_hash($password, PASSWORD_DEFAULT);
                 try {
-                    $this->q($pdo, "INSERT INTO users (nama_lengkap, email, password, role, asal_desa, nama_organisasi) VALUES (?,?,?,?,?,?)", [$nama, $email, $hash, $role, $asal_desa, $nama_org]);
+                    $this->q($pdo, "INSERT INTO users (nama_lengkap, email, password, role, asal_desa, provinsi, kota, kecamatan, nama_organisasi) VALUES (?,?,?,?,?,?,?,?,?)", [$nama, $email, $hash, $role, $asal_desa, $provinsi, $kota, $kecamatan, $nama_org]);
                     $success = 'Pendaftaran berhasil! Silakan Login.';
                 } catch (PDOException $e) { $error = 'Terjadi kesalahan: ' . $e->getMessage(); }
             }
@@ -217,7 +223,15 @@ class LegacyController extends Controller
                 $success = "Permintaan bantuan beserta dokumen berhasil diajukan!";
             } catch (PDOException $e) { $error = "Gagal mengajukan permintaan: " . $e->getMessage(); }
         }
-        return view('legacy.contact', compact('success', 'error'));
+
+        $wilayah_desa = [
+            'provinsi'  => $_SESSION['provinsi']  ?? '',
+            'kota'      => $_SESSION['kota']      ?? '',
+            'kecamatan' => $_SESSION['kecamatan'] ?? '',
+            'desa'      => $_SESSION['asal_desa'] ?? '',
+        ];
+
+        return view('legacy.contact', compact('success', 'error', 'wilayah_desa'));
     }
 
     public function portfolio(Request $request)

@@ -104,22 +104,23 @@
 
                 <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200 mb-6">
                     <h4 class="font-bold text-amber-900 mb-4 border-b border-amber-200 pb-2">Informasi Wilayah Desa</h4>
+                    <p class="text-xs text-slate-500 mb-4">Data wilayah diambil dari profil akun Anda. Hubungi admin jika perlu dikoreksi.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Provinsi</label>
-                            <input type="text" name="provinsi" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white transition" placeholder="Contoh: Jawa Timur" required>
+                            <input type="text" name="provinsi" value="<?= htmlspecialchars($wilayah_desa['provinsi']) ?>" readonly class="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-200 text-slate-500 cursor-not-allowed outline-none" required>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Kota / Kabupaten</label>
-                            <input type="text" name="kota" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white transition" placeholder="Contoh: Surabaya" required>
+                            <input type="text" name="kota" value="<?= htmlspecialchars($wilayah_desa['kota']) ?>" readonly class="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-200 text-slate-500 cursor-not-allowed outline-none" required>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Kecamatan</label>
-                            <input type="text" name="kecamatan" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white transition" required>
+                            <input type="text" name="kecamatan" value="<?= htmlspecialchars($wilayah_desa['kecamatan']) ?>" readonly class="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-200 text-slate-500 cursor-not-allowed outline-none" required>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Desa / Kelurahan</label>
-                            <input type="text" name="desa" value="<?= htmlspecialchars($_SESSION['asal_desa'] ?? '') ?>" readonly class="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-200 text-slate-500 cursor-not-allowed outline-none" required>
+                            <input type="text" name="desa" value="<?= htmlspecialchars($wilayah_desa['desa']) ?>" readonly class="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-200 text-slate-500 cursor-not-allowed outline-none" required>
                         </div>
                     </div>
                 </div>

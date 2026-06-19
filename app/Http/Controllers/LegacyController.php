@@ -102,13 +102,28 @@ class LegacyController extends Controller
         $total_program_aktif = (int) ($this->fetchOne($pdo, "SELECT (SELECT COUNT(*) FROM permintaan_bantuan WHERE status='approved' AND is_funded=0)+(SELECT COUNT(*) FROM penawaran_bantuan WHERE status='approved' AND is_funded=0) as total")['total'] ?? 0);
         $total_desa = (int) ($this->fetchOne($pdo, "SELECT COUNT(DISTINCT desa) as total FROM permintaan_bantuan WHERE is_funded = 1")['total'] ?? 0);
 
+        // Data grafik donut — status program gabungan
+        $status_pending  = (int)(($this->fetchOne($pdo, "SELECT (SELECT COUNT(*) FROM permintaan_bantuan WHERE status='pending')+(SELECT COUNT(*) FROM penawaran_bantuan WHERE status='pending') as total")['total']) ?? 0);
+        $status_approved = (int)(($this->fetchOne($pdo, "SELECT (SELECT COUNT(*) FROM permintaan_bantuan WHERE status='approved')+(SELECT COUNT(*) FROM penawaran_bantuan WHERE status='approved') as total")['total']) ?? 0);
+        $status_rejected = (int)(($this->fetchOne($pdo, "SELECT (SELECT COUNT(*) FROM permintaan_bantuan WHERE status='rejected')+(SELECT COUNT(*) FROM penawaran_bantuan WHERE status='rejected') as total")['total']) ?? 0);
+        $status_funded   = (int)(($this->fetchOne($pdo, "SELECT (SELECT COUNT(*) FROM permintaan_bantuan WHERE is_funded=1)+(SELECT COUNT(*) FROM penawaran_bantuan WHERE is_funded=1) as total")['total']) ?? 0);
+        $chart_status = json_encode([$status_pending, $status_approved, $status_rejected, $status_funded]);
+
+        // Data grafik bar — jenis bantuan donatur (top 6)
+        $rows_jenis = $this->fetchAll($pdo, "SELECT jenis_penawaran as label, COUNT(*) as total FROM penawaran_bantuan GROUP BY jenis_penawaran ORDER BY total DESC LIMIT 6");
+        $chart_jenis_labels = json_encode(array_column($rows_jenis, 'label'));
+        $chart_jenis_data   = json_encode(array_column($rows_jenis, 'total'));
+
         $btn_link = 'login.php'; $btn_text = 'Mulai Sekarang';
         if (isset($_SESSION['role'])) {
             if ($_SESSION['role'] === 'desa') { $btn_link = 'contact.php'; $btn_text = 'Mulai Pengajuan Bantuan'; }
             elseif ($_SESSION['role'] === 'donatur') { $btn_link = 'contact.php'; $btn_text = 'Tawarkan Bantuan'; }
             elseif ($_SESSION['role'] === 'admin') { $btn_link = 'dashboard-admin.php'; $btn_text = 'Buka Panel Admin'; }
         }
-        return view('legacy.index', compact('btn_link', 'btn_text', 'total_kk', 'total_program_aktif', 'total_desa'));
+        return view('legacy.index', compact(
+            'btn_link', 'btn_text', 'total_kk', 'total_program_aktif', 'total_desa',
+            'chart_status', 'chart_jenis_labels', 'chart_jenis_data'
+        ));
     }
 
     public function staticPage(string $page)

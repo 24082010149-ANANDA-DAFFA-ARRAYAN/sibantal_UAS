@@ -17,7 +17,7 @@
             <p class="text-slate-400 mt-1">Kelola dan tinjau pengajuan desa serta penawaran donatur.</p>
         </div>
 
-        <div class="relative z-10 flex items-center gap-3 md:gap-4">
+        <div class="relative z-10 flex flex-wrap items-center gap-3 md:gap-4">
             <div class="text-center px-4 py-2 border border-slate-700 rounded-lg bg-slate-800">
                 <span class="block text-xs text-slate-400">Antrean Desa</span>
                 <span class="text-xl font-bold text-amber-400"><?= $count_desa ?></span>
@@ -26,6 +26,10 @@
                 <span class="block text-xs text-slate-400">Antrean Donatur</span>
                 <span class="text-xl font-bold text-teal-400"><?= $count_donatur ?></span>
             </div>
+            <button onclick="downloadLaporan()" class="flex items-center gap-2 px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-white text-sm font-bold rounded-lg transition shadow-lg shadow-teal-900/30">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Unduh Laporan PDF
+            </button>
         </div>
     </div> <?= $pesan ?>
 
@@ -235,3 +239,152 @@
 </main>
 
 @include('layouts.footer')
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+// Data dari PHP untuk laporan — semua data (bukan hanya halaman aktif)
+const laporanDesa = <?= json_encode(array_map(fn($r) => [
+    'tgl'    => date('d/m/Y', strtotime($r['created_at'])),
+    'desa'   => $r['desa'],
+    'pj'     => $r['nama_pj'],
+    'target' => $r['target_bantuan'] === 'warga' ? 'Warga Terdampak' : 'Fasilitas Umum',
+    'kk'     => $r['jumlah_kk'] ? $r['jumlah_kk'].' KK' : '-',
+    'status' => match($r['status']) { 'pending'=>'Menunggu', 'approved'=>'Disetujui', 'rejected'=>'Ditolak', default=>$r['status'] },
+    'dana'   => $r['is_funded'] ? 'Sudah Didanai' : 'Belum',
+], $query_desa)) ?>;
+
+const laporanDonatur = <?= json_encode(array_map(fn($r) => [
+    'tgl'    => date('d/m/Y', strtotime($r['created_at'])),
+    'instansi' => $r['nama_instansi'],
+    'pj'     => $r['pj_donatur'],
+    'jenis'  => $r['jenis_penawaran'],
+    'status' => match($r['status']) { 'pending'=>'Menunggu', 'approved'=>'Disetujui', 'rejected'=>'Ditolak', default=>$r['status'] },
+    'klaim'  => $r['is_funded'] ? 'Sudah Diambil' : 'Belum',
+], $query_donatur)) ?>;
+
+const statsDesa    = <?= json_encode($stats_desa) ?>;
+const statsDonatur = <?= json_encode($stats_donatur) ?>;
+const totalDesa    = <?= $total_desa ?>;
+const totalDonatur = <?= $total_donatur ?>;
+
+function downloadLaporan() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const tglCetak = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
+    const W = doc.internal.pageSize.getWidth();
+
+    // ── Header ────────────────────────────────────────────────────────────────
+    doc.setFillColor(15, 118, 110); // teal-700
+    doc.rect(0, 0, W, 32, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+    doc.text('SI BanTal — Sistem Informasi Bantuan Sosial', W / 2, 13, { align: 'center' });
+    doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+    doc.text('Laporan Rekapitulasi Program Bantuan Sosial', W / 2, 21, { align: 'center' });
+    doc.text(`Dicetak pada: ${tglCetak}`, W / 2, 28, { align: 'center' });
+
+    // ── Ringkasan Eksekutif ───────────────────────────────────────────────────
+    doc.setTextColor(30, 41, 59);
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+    doc.text('A. Ringkasan Eksekutif', 14, 42);
+
+    doc.autoTable({
+        startY: 46,
+        head: [['Kategori', 'Menunggu', 'Disetujui', 'Ditolak', 'Tersalurkan', 'Total']],
+        body: [
+            ['Pengajuan Desa', statsDesa.pending, statsDesa.approved, statsDesa.rejected, statsDesa.funded, totalDesa],
+            ['Penawaran Donatur', statsDonatur.pending, statsDonatur.approved, statsDonatur.rejected, statsDonatur.funded, totalDonatur],
+            [
+                { content: 'TOTAL GABUNGAN', styles: { fontStyle: 'bold' } },
+                statsDesa.pending + statsDonatur.pending,
+                statsDesa.approved + statsDonatur.approved,
+                statsDesa.rejected + statsDonatur.rejected,
+                statsDesa.funded + statsDonatur.funded,
+                totalDesa + totalDonatur,
+            ],
+        ],
+        headStyles: { fillColor: [15, 118, 110], textColor: 255, fontStyle: 'bold', fontSize: 9 },
+        bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [240, 253, 250] },
+        columnStyles: {
+            0: { cellWidth: 50 },
+            1: { halign: 'center' },
+            2: { halign: 'center' },
+            3: { halign: 'center' },
+            4: { halign: 'center' },
+            5: { halign: 'center', fontStyle: 'bold' },
+        },
+        margin: { left: 14, right: 14 },
+    });
+
+    // ── Tabel Pengajuan Desa ──────────────────────────────────────────────────
+    let y = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(30, 41, 59);
+    doc.text('B. Data Pengajuan Perangkat Desa', 14, y);
+
+    doc.autoTable({
+        startY: y + 4,
+        head: [['No', 'Tanggal', 'Nama Desa', 'Penanggung Jawab', 'Target', 'Jml KK', 'Status', 'Dana']],
+        body: laporanDesa.length > 0
+            ? laporanDesa.map((r, i) => [i+1, r.tgl, r.desa, r.pj, r.target, r.kk, r.status, r.dana])
+            : [[{ content: 'Tidak ada data pada halaman ini', colSpan: 8, styles: { halign: 'center', textColor: [148,163,184] } }]],
+        headStyles: { fillColor: [245, 158, 11], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+        bodyStyles: { fontSize: 8 },
+        alternateRowStyles: { fillColor: [255, 251, 235] },
+        columnStyles: {
+            0: { cellWidth: 8, halign: 'center' },
+            1: { cellWidth: 20 },
+            2: { cellWidth: 32 },
+            3: { cellWidth: 32 },
+            4: { cellWidth: 26 },
+            5: { cellWidth: 14, halign: 'center' },
+            6: { cellWidth: 20, halign: 'center' },
+            7: { cellWidth: 22, halign: 'center' },
+        },
+        margin: { left: 14, right: 14 },
+    });
+
+    // ── Tabel Penawaran Donatur ───────────────────────────────────────────────
+    y = doc.lastAutoTable.finalY + 10;
+    // tambah halaman baru kalau space tidak cukup
+    if (y > 240) { doc.addPage(); y = 20; }
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(30, 41, 59);
+    doc.text('C. Data Penawaran Donatur', 14, y);
+
+    doc.autoTable({
+        startY: y + 4,
+        head: [['No', 'Tanggal', 'Nama Instansi', 'Penanggung Jawab', 'Jenis Bantuan', 'Status', 'Klaim']],
+        body: laporanDonatur.length > 0
+            ? laporanDonatur.map((r, i) => [i+1, r.tgl, r.instansi, r.pj, r.jenis, r.status, r.klaim])
+            : [[{ content: 'Tidak ada data pada halaman ini', colSpan: 7, styles: { halign: 'center', textColor: [148,163,184] } }]],
+        headStyles: { fillColor: [15, 118, 110], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+        bodyStyles: { fontSize: 8 },
+        alternateRowStyles: { fillColor: [240, 253, 250] },
+        columnStyles: {
+            0: { cellWidth: 8, halign: 'center' },
+            1: { cellWidth: 20 },
+            2: { cellWidth: 40 },
+            3: { cellWidth: 35 },
+            4: { cellWidth: 40 },
+            5: { cellWidth: 20, halign: 'center' },
+            6: { cellWidth: 23, halign: 'center' },
+        },
+        margin: { left: 14, right: 14 },
+    });
+
+    // ── Footer tiap halaman ───────────────────────────────────────────────────
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+        doc.setTextColor(148, 163, 184);
+        doc.text(`SI BanTal — Laporan Rekapitulasi ${tglCetak}`, 14, 292);
+        doc.text(`Halaman ${i} dari ${totalPages}`, W - 14, 292, { align: 'right' });
+        doc.setDrawColor(203, 213, 225);
+        doc.line(14, 289, W - 14, 289);
+    }
+
+    doc.save(`Laporan_SI_BanTal_${tglCetak.replace(/ /g,'_')}.pdf`);
+}
+</script>
